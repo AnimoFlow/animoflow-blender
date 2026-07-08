@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+dist/
+*.zip
+.DS_Store
+tests/headless/hf_token.txt

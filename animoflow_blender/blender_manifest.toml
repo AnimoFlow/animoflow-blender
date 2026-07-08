@@ -1,0 +1,26 @@
+schema_version = "1.0.0"
+
+# Blender 4.2+ extension manifest. Blender <= 4.1 ignores this file and
+# uses bl_info in __init__.py instead (legacy add-on install path) — keep
+# the two version numbers in sync. scripts/build.sh single-sources the
+# artifact version from this file.
+id = "animoflow"
+version = "0.1.0"
+name = "AnimoFlow"
+tagline = "Generate character animation from text prompts"
+maintainer = "AnimoFlow <guy@animoflow.ai>"
+type = "add-on"
+website = "https://animoflow.ai/guide/blender"
+tags = ["Animation", "Rigging"]
+blender_version_min = "4.2.0"
+license = ["SPDX:GPL-3.0-or-later"]
+
+[permissions]
+network = "Connect to AnimoFlow cloud or a local server"
+
+[build]
+paths_exclude_pattern = [
+  "__pycache__/",
+  ".*",
+  "*.zip",
+]
