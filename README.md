@@ -11,6 +11,7 @@ Blender addon for [AnimoFlow](https://animoflow.ai) — generate character motio
 
 ## Install
 
+
 ### Blender 4.2+ — extension repository (recommended, auto-updates)
 
 > *Available with the public release.*
