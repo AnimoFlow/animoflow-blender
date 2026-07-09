@@ -124,3 +124,4 @@ Use it freely, including commercially; if you distribute a modified
 version, it must stay GPL-3.0. External contributions require a one-time
 CLA (a bot asks on your first pull request). Full AnimoFlow license map,
 FAQ, and CLA text: [AnimoFlow/legal](https://github.com/AnimoFlow/legal).
+
