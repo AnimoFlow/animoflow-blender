@@ -414,9 +414,19 @@ def poll_job(base_url, job_id, api_key=""):
 
 def fetch_characters(base_url, api_key=""):
     """GET /v1/characters → list[str]. Falls back to defaults on error."""
+    names, _categories = fetch_characters_full(base_url, api_key=api_key)
+    return names
+
+
+def fetch_characters_full(base_url, api_key=""):
+    """GET /v1/characters → (names, categories). categories maps a character
+    name to its server-declared category (e.g. "robot"); missing or unknown
+    values mean a standard humanoid rig."""
     try:
         result = _get_json(f"{base_url}/v1/characters", timeout=20, api_key=api_key)
-        return result.get("characters") or ["Y_bot"]
+        names = result.get("characters") or ["Y_bot"]
+        categories = result.get("categories") or {}
+        return names, categories
     except Exception as e:
         raise RuntimeError(f"Failed to fetch characters from {base_url}: {e}") from e
 

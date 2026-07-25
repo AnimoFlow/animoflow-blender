@@ -40,12 +40,22 @@ _tasks_data: list[dict] = []
 
 def refresh_characters(base_url, api_key=""):
     global _character_items
-    chars = api.fetch_characters(base_url, api_key=api_key)
+    chars, categories = api.fetch_characters_full(base_url, api_key=api_key)
     # Order: Y_bot first (the default we want pre-selected), then the rest
     # alphabetically. Blender's EnumProperty with a callback-based `items`
     # has no separate `default` knob — the first item wins.
-    chars = sorted(chars, key=lambda c: (0 if c == "Y_bot" else 1, c))
-    _character_items = [(c, c.replace("_", " "), "") for c in chars]
+    humanoids = sorted(
+        (c for c in chars if categories.get(c) != "robot"),
+        key=lambda c: (0 if c == "Y_bot" else 1, c),
+    )
+    robots = sorted(c for c in chars if categories.get(c) == "robot")
+    items = [(c, c.replace("_", " "), "") for c in humanoids]
+    if robots:
+        # Empty-identifier entry renders as a section heading in the
+        # dropdown — the server's category field drives the grouping.
+        items.append(("", "Robots", ""))
+        items.extend((c, c.replace("_", " "), "") for c in robots)
+    _character_items = items
 
 
 def refresh_tasks(base_url, api_key=""):
