@@ -147,6 +147,22 @@ class TestFetchCharacters:
             chars = api.fetch_characters(BASE, api_key=KEY)
         assert chars == ["Y_bot"]
 
+    def test_full_returns_path_scales(self):
+        payload = {"characters": ["Y_bot", "Unitree G1"],
+                   "categories": {"Y_bot": "humanoid", "Unitree G1": "robot"},
+                   "path_scales": {"Y_bot": 1.0, "Unitree G1": 1.198}}
+        with patch("urllib.request.urlopen", return_value=_mock_response(payload)):
+            names, categories, scales = api.fetch_characters_full(BASE, api_key=KEY)
+        assert names == ["Y_bot", "Unitree G1"]
+        assert categories["Unitree G1"] == "robot"
+        assert scales["Unitree G1"] == 1.198
+
+    def test_full_defaults_path_scales_when_absent(self):
+        with patch("urllib.request.urlopen",
+                   return_value=_mock_response({"characters": ["Y_bot"]})):
+            _names, _categories, scales = api.fetch_characters_full(BASE, api_key=KEY)
+        assert scales == {}
+
 
 # ---------------------------------------------------------------------------
 # _friendly_error() via operators

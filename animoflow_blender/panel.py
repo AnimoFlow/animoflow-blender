@@ -34,13 +34,26 @@ _character_items = [("Y_bot", "Y-Bot", "")]
 _task_items  = [("__loading__", "Connect to server first", "")]
 _model_items = [("__loading__", "Connect to server first", "")]
 
+# Per-character drawn-path scale from /v1/characters (path_scales): the
+# feasibility math multiplies drawn lengths by it — a smaller robot covers
+# a drawn path with more relative effort. Missing entries mean 1.0.
+_char_path_scales: dict[str, float] = {}
+
+
+def _path_scale_for(character: str) -> float:
+    try:
+        return float(_char_path_scales.get(character, 1.0)) or 1.0
+    except (TypeError, ValueError):
+        return 1.0
+
 # Full task catalog as returned by /v1/tasks; used to look up models per task.
 _tasks_data: list[dict] = []
 
 
 def refresh_characters(base_url, api_key=""):
-    global _character_items
-    chars, categories = api.fetch_characters_full(base_url, api_key=api_key)
+    global _character_items, _char_path_scales
+    chars, categories, path_scales = api.fetch_characters_full(base_url, api_key=api_key)
+    _char_path_scales = dict(path_scales)
     # Order: Y_bot first (the default we want pre-selected), then the rest
     # alphabetically. Blender's EnumProperty with a callback-based `items`
     # has no separate `default` knob — the first item wins.
@@ -463,12 +476,15 @@ class ANIMOFLOW_PT_Main(bpy.types.Panel):
                 from . import payload as _payload_mod
                 _length = _payload_mod.curve_length_quick(props.trajectory_curve)
                 if _length:
-                    _warn = _geometry.pace_warning_lines(_length, props.duration)
+                    # Effective length: robots cover a drawn path with more
+                    # relative effort (server-declared path_scales).
+                    _eff = _length * _path_scale_for(props.character)
+                    _warn = _geometry.pace_warning_lines(_eff, props.duration)
                     if _warn:
                         _draw_warning_lines(box, _warn)
                     else:
                         box.label(text=f"{_length:.1f} m · "
-                                       f"≈ {_length / max(props.duration, 0.1):.1f} m/s")
+                                       f"≈ {_eff / max(props.duration, 0.1):.1f} m/s")
 
         elif task_id == "timeline":
             box = layout.box()
@@ -514,11 +530,14 @@ class ANIMOFLOW_PT_Main(bpy.types.Panel):
                 box.label(text="Times must strictly increase.", icon="ERROR")
             else:
                 # Pace feasibility across legs (row #1 is the start, t=0).
+                # Coordinates scaled by the character's path scale so leg
+                # distances (and the warning) reflect effective effort.
+                _ps = _path_scale_for(props.character)
                 pts = []
                 for w in props.waypoints:
                     if w.empty is not None:
                         loc = w.empty.matrix_world.translation
-                        pts.append((loc.x, loc.y, float(w.t_sec)))
+                        pts.append((loc.x * _ps, loc.y * _ps, float(w.t_sec)))
                 _warn = _geometry.waypoint_pace_warning_lines(pts)
                 if _warn:
                     _draw_warning_lines(box, _warn)

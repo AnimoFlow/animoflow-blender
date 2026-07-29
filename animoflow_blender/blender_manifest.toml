@@ -5,7 +5,7 @@ schema_version = "1.0.0"
 # the two version numbers in sync. scripts/build.sh single-sources the
 # artifact version from this file.
 id = "animoflow"
-version = "0.2.0"
+version = "0.2.1"
 name = "AnimoFlow"
 tagline = "Generate character animation from text prompts"
 maintainer = "AnimoFlow <guy@animoflow.ai>"
