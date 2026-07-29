@@ -6,7 +6,7 @@ Generate motion animations from text — powered by AnimoFlow.
 bl_info = {
     "name": "AnimoFlow",
     "author": "AnimoFlow",
-    "version": (0, 1, 0),
+    "version": (0, 1, 1),
     "blender": (3, 6, 0),
     "location": "View3D > Sidebar > AnimoFlow",
     "description": "Generate motion from text, trajectories, waypoints and timelines via AnimoFlow",
